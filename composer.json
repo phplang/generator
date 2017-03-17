@@ -1,0 +1,28 @@
+{
+  "name": "phplang/generator",
+  "description": "Generator utility functions",
+  "type": "library",
+  "keywords": [
+    "generator"
+  ],
+  "homepage": "https://github.com/phplang/generator",
+  "license": "Public Domain",
+  "authors": [
+    {
+      "name": "Sara Golemon",
+      "email": "pollita@php.net",
+      "homepage": "https://twitter.com/SaraMG",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "src/file.php",
+      "src/math.php",
+      "src/traversable.php"
+    ]
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  }
+}
