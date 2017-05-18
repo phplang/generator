@@ -28,6 +28,12 @@ function iterable_map(Iterable $in, ...$args) {
   }
 }
 
+function iterable_map_method(...$args) {
+  $method = array_pop($args);
+  array_push($args, function($elem) use ($method) { return $elem->$method(); });
+  yield from iterable_map(...$args);
+}
+
 const ITERABLE_FILTER_USE_VALUE = 0;
 const ITERABLE_FILTER_USE_KEY   = \ARRAY_FILTER_USE_KEY;
 const ITERABLE_FILTER_USE_BOTH  = \ARRAY_FILTER_USE_BOTH;
@@ -51,6 +57,16 @@ function iterable_filter(Callable $cb, Iterable $in, int $type = ITERABLE_FILTER
       }
     }
   }
+}
+
+function iterable_filter_method(string $method, Iterable $in) {
+  yield from iterable_filter(
+    function($elem) use ($method) {
+      return $elem->$method();
+    },
+    $in,
+    ITERABLE_FILTER_USE_VALUE
+  );
 }
 
 /* BC for Initial Commit */
