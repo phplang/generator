@@ -19,8 +19,11 @@
     "files": [
       "src/file.php",
       "src/math.php",
-      "src/traversable.php"
+      "src/iterable.php"
     ]
+  },
+  "require": {
+    "php": "^7.1"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
