@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+use PHPUnit\Framework\TestCase;
 use PhpLang\Generator as G;
 
-class MathTest extends PHPUnit_Framework_TestCase {
+class MathTest extends TestCase {
   public function testRange() {
     $tests = [
       [ 1, 10, 1 ],

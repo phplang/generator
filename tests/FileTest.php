@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+use PHPUnit\Framework\TestCase;
 use PhpLang\Generator as G;
 
-class FileTest extends PHPUnit_Framework_TestCase {
+class FileTest extends TestCase {
   public function testStreamGetContents() {
     $data = fopen('data:text/plain,abcdef', 'rb');
     $blocks = 0;

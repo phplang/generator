@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+use PHPUnit\Framework\TestCase;
 use PhpLang\Generator as G;
 
-class IterableTest extends PHPUnit_Framework_TestCase {
+class IterableTest extends TestCase {
   public function testFilter() {
     $this->assertEquals(
       [0=>1,2=>3,4=>5,6=>7,8=>9],
