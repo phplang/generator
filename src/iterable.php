@@ -2,6 +2,14 @@
 
 namespace PhpLang\Generator;
 
+/* Iterable friendly version of array_map()
+ *
+ * @param Iterable ...$in - One or more iterables to map across
+ * @param Callable $cb - Function to call each iterable element on
+ *                       (function(mixed $val): mixed)
+ *
+ * @yield Elements of input iterables mapped through $cb
+ */
 function iterable_map(Iterable $in, ...$args) {
   if (count($args) < 1) {
     trigger_error("Missing callback arg", \E_USER_WARNING);
@@ -28,6 +36,13 @@ function iterable_map(Iterable $in, ...$args) {
   }
 }
 
+/* Convenience wrapper for iterable_map() to call a given method on each element
+ *
+ * @param Iterable ...$in - One or more iterables to map across
+ * @param string $method - Name of zero-args method to call on each element
+ *
+ * @yield Elements of input iterables mapped through $elem->$method()
+ */
 function iterable_map_method(...$args) {
   $method = array_pop($args);
   array_push($args, function($elem) use ($method) { return $elem->$method(); });
@@ -37,6 +52,15 @@ function iterable_map_method(...$args) {
 const ITERABLE_FILTER_USE_VALUE = 0;
 const ITERABLE_FILTER_USE_KEY   = \ARRAY_FILTER_USE_KEY;
 const ITERABLE_FILTER_USE_BOTH  = \ARRAY_FILTER_USE_BOTH;
+/* Iterable friendly version of array_filter()
+ *
+ * @param Callable $cb - Callback to invoke on each element
+ * @param Iterable $in - Iterable to filter
+ * @param int $type - Bitmask of elements to pass to callback
+ *                    See ITERABLE_FILTER_USE_* constants int his namespace
+ *
+ * @yield - Filtered iterable elements
+ */
 function iterable_filter(Callable $cb, Iterable $in, int $type = ITERABLE_FILTER_USE_VALUE) {
   if ($type == ITERABLE_FILTER_USE_KEY) {
     foreach ($in as $k => $v) {
@@ -59,6 +83,13 @@ function iterable_filter(Callable $cb, Iterable $in, int $type = ITERABLE_FILTER
   }
 }
 
+/* Convenience wrapper for iterable_filter() to use a given method to filter each element
+ *
+ * @param string $method - Name of zero-args method to call on each element
+ * @param Iterable $in - Ierables to filter
+ *
+ * @yield Elements of input iterable filtered by $elem->$method()
+ */
 function iterable_filter_method(string $method, Iterable $in) {
   yield from iterable_filter(
     function($elem) use ($method) {
@@ -69,6 +100,31 @@ function iterable_filter_method(string $method, Iterable $in) {
   );
 }
 
+/* Multisort/collator for multiple PRESORTED iterables.
+ *
+ * Note that this method assumes the input iterables are already correctly
+ * sorted such that the first element in a given iterable should always come
+ * before later elements in the same iterable.
+ *
+ * How those individual iterables should be sorted is dependent on where the
+ * data is sourced from, but a (dumb/inefficient) general purpose algorithm
+ * might look something like:
+ *
+ * $sorted = (function(Iterable $unsorted, Callable $cmp) {
+ *   $tmp = \iterable_to_array($unsorted);
+ *   usort($tmp, $cmp);
+ *   yield from $tmp;
+ * })($unsorted, $cmp);
+ *
+ * In practice, any API providing data should have its own native sorting option,
+ * and that should be used/preferred.
+ *
+ * @param Callable $cmp - Comparator function, takes two ares and returns -1, 0, 1
+ *                        Similar to version_compare(), strcmp(), <=>, etc...
+ * @param Iterable ...$in - One or more iterables to multisort/collate
+ *
+ * @yield - Sorted iterable elements
+ */
 function iterable_multisort(Callable $cmp, Iterable $first, Iterable ...$args) {
   array_unshift($args, $first);
   $args = array_values($args);
