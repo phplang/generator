@@ -99,4 +99,23 @@ class IterableTest extends TestCase {
       )
     );
   }
+
+  public function testMultiSort() {
+    $iterables = [
+      [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      (function() { yield from [ 15, 35, 55, 75, 95 ]; })(),
+      G\range(47, 53),
+    ];
+    $this->assertEquals(
+      [ 10, 15, 20, 30, 35, 40, 47, 48, 49, 50, 50,
+        51, 52, 53, 55, 60, 70, 75, 80, 90, 95, 100 ],
+      iterator_to_array(
+        G\iterable_multisort(
+          function($a, $b) { return $a <=> $b; },
+          ...$iterables
+        ),
+        false
+      )
+    );
+  }
 }

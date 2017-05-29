@@ -69,6 +69,44 @@ function iterable_filter_method(string $method, Iterable $in) {
   );
 }
 
+function iterable_multisort(Callable $cmp, Iterable $first, Iterable ...$args) {
+  array_unshift($args, $first);
+  $args = array_values($args);
+
+  // Normalize arrays into traversables
+  $args = array_map(function ($arg) {
+    return is_array($arg) ? (function(array $arg) { yield from $arg; })($arg) : $arg;
+  }, $args);
+
+  // Initial full sort of heads
+  usort($args, function ($a, $b) use ($cmp) {
+    return $cmp($a->current(), $b->current());
+  });
+
+  while ($args) {
+    // Assume first iterable is in lowest
+    // due to initial sort and/or update sort
+    yield $args[0]->current();
+    $args[0]->next();
+
+    if (!$args[0]->valid()) {
+      // Remove empty column
+      array_shift($args);
+      $args = array_values($args);
+    }
+
+    // Update sort, shift iterable down stack till it's in order
+    for ($i = 0; $i < (count($args) - 1); ++$i) {
+      if ($cmp($args[$i]->current(), $args[$i + 1]->current()) <= 0) {
+        break;
+      }
+      $tmp = $args[$i+1];
+      $args[$i+1] = $args[$i];
+      $args[$i] = $tmp;
+    }
+  }
+}
+
 /* BC for Initial Commit */
 const TRAVERSABLE_FILTER_USE_VALUE = ITERABLE_FILTER_USE_VALUE;
 const TRAVERSABLE_FILTER_USE_KEY   = ITERABLE_FILTER_USE_KEY;
