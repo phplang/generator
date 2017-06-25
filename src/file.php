@@ -22,6 +22,51 @@ function stream_get_contents($stream, int $blocksize = 8192) {
 }
 
 /**
+ * Read from a stream resource in fixed block sizes
+ *
+ * @param resource<file> $stream - An already opened stream, or a URI
+ * @param int $blocksize - Size of blocks to yield
+ *
+ * @yield string - Blocks of $blocksize octets (or fewer on the last read)
+ */
+function stream_get_blocks($stream, int $blocksize) {
+  $carryover = '';
+  foreach (stream_get_contents($stream) as $block) {
+    $offset = 0;
+    if (strlen($carryover) && (strlen($carryover) + strlen($block) >= $blocksize)) {
+      $offset = $blocksize - strlen($carryover);
+      yield $carryover . substr($block, 0, $offset);
+    }
+
+    while (($offset + $blocksize) <= strlen($block)) {
+       yield substr($block, $offset, $blocksize);
+       $offset += $blocksize;
+    }
+    $carryover = substr($block, $offset);
+  }
+
+  if (strlen($carryover)) {
+    yield $carryover;
+  }
+}
+
+/**
+ * Read from a stream resource in single octet increments
+ * This is a specialization of stream_get_blocks()
+ *
+ * @param resource<file> $stream - An already opened stream, or a URI
+ *
+ * @yield string - Individual character from the stream
+ */
+function stream_get_chars($stream) {
+  foreach (stream_get_contents($stream) as $block) {
+    for ($i = 0; $i < strlen($block); ++$i) {
+      yield $block[$i];
+    }
+  }
+}
+
+/**
  * Read a file line by line
  *
  * @param string|resource<file> $stream - An already opened stream, or a URI
