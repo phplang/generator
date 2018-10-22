@@ -4,6 +4,37 @@ use PHPUnit\Framework\TestCase;
 use PhpLang\Generator as G;
 
 class IterableTest extends TestCase {
+  public function testAll() {
+    $isOdd = function($v) { return $v & 1; };
+    $lt10 = function($v) { return $v < 10; };
+    $this->assertTrue(G\iterable_all([1,3,5], $isOdd));
+    $this->assertFalse(G\iterable_all([1,3,6], $isOdd));
+    $this->assertTrue(G\iterable_all(range(1,9), $lt10));
+    $this->assertFalse(G\iterable_all(range(1,10), $lt10));
+  }
+
+  public function testAny() {
+    $isOdd = function($v) { return $v & 1; };
+    $lt10 = function($v) { return $v < 10; };
+    $this->assertTrue(G\iterable_any([1,3,5], $isOdd));
+    $this->assertTrue(G\iterable_any([1,3,6], $isOdd));
+    $this->assertFalse(G\iterable_any([2,4,6], $isOdd));
+    $this->assertTrue(G\iterable_any(range(1,9), $lt10));
+    $this->assertTrue(G\iterable_any(range(1,10), $lt10));
+    $this->assertFalse(G\iterable_any(range(10,20), $lt10));
+  }
+
+  public function testNone() {
+    $isOdd = function($v) { return $v & 1; };
+    $lt10 = function($v) { return $v < 10; };
+    $this->assertFalse(G\iterable_none([1,3,5], $isOdd));
+    $this->assertFalse(G\iterable_none([1,3,6], $isOdd));
+    $this->assertTrue(G\iterable_none([2,4,6], $isOdd));
+    $this->assertFalse(G\iterable_none(range(1,9), $lt10));
+    $this->assertFalse(G\iterable_none(range(1,10), $lt10));
+    $this->assertTrue(G\iterable_none(range(10,20), $lt10));
+  }
+
   public function testFilter() {
     $this->assertEquals(
       [0=>1,2=>3,4=>5,6=>7,8=>9],

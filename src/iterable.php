@@ -2,6 +2,51 @@
 
 namespace PhpLang\Generator;
 
+/* Return true if all elements of $in return true for $predicate.
+ *
+ * @param Iterable $in - Iterable to be examined.
+ * @param Callable $predicate - Function to call with each element.
+ * @return bool - TRUE if all elements of $in satisfy $predicate, FALSE otherwise.
+ */
+function iterable_all(Iterable $in, Callable $predicate): bool {
+  foreach ($in as $k => $v) {
+    if (!$predicate($v, $k)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/* Return true if any element of $in returns true for $predicate.
+ *
+ * @param Iterable $in - Iterable to be examined.
+ * @param Callable $predicate - Function to call with each element.
+ * @return bool - TRUE if any element of $in satisfies $predicate, FALSE otherwise.
+ */
+function iterable_any(Iterable $in, Callable $predicate): bool {
+  foreach ($in as $k => $v) {
+    if ($predicate($v, $k)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Return true if no element of $in returns true for $predicate.
+ *
+ * @param Iterable $in - Iterable to be examined.
+ * @param Callable $predicate - Function to call with each element.
+ * @return bool - TRUE if no element of $in satisfies $predicate, FALSE otherwise.
+ */
+function iterable_none(Iterable $in, Callable $predicate): bool {
+  foreach ($in as $k => $v) {
+    if ($predicate($v, $k)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /* Iterable friendly version of array_map()
  *
  * @param Iterable ...$in - One or more iterables to map across
